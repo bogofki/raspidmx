@@ -5,6 +5,15 @@
 LIB=raspidmx
 LIBPNG=raspidmxPng
 
+RPI_VC_INC_DIR ?= /opt/vc/include
+RPI_VC_LIB_DIR ?= /opt/vc/lib
+
+ifeq ("$(wildcard $(RPI_VC_INC_DIR))", "")
+RPI_VC_INC_DIR=/usr/include
+RPI_VC_LIB_DIR=/usr/lib/arm-linux-gnueabihf
+$(shell printf "\e[1;35m%s\e[0m: %s \e[1;36m%s\e[0m\n" "NOTE" "libpng12 pkg-config required. Run like:" "PATH=<path to libpng12>/bin:\$${PATH} make" 1>&2)
+endif
+
 OBJS=../common/backgroundLayer.o ../common/imageGraphics.o ../common/key.o \
  ../common/font.o ../common/imageKey.o ../common/hsv2rgb.o \
  ../common/imageLayer.o ../common/image.o ../common/imagePalette.o
@@ -12,10 +21,10 @@ OBJS=../common/backgroundLayer.o ../common/imageGraphics.o ../common/key.o \
 OBJSPNG=../common/spriteLayer.o ../common/loadpng.o ../common/savepng.o ../common/scrollingLayer.o
 
 CFLAGS+=-Wall -g -O3 -I../common $(shell libpng-config --cflags)
-LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm
+LDFLAGS+=-L$(RPI_VC_LIB_DIR)/ -lbcm_host -lm
 LDFLAGSPNG=${LDFLAGS} $(shell libpng-config --ldflags)
 
-INCLUDES+=-I/opt/vc/include/ -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux
+INCLUDES+=-I$(RPI_VC_INC_DIR)/ -I$(RPI_VC_INC_DIR)/interface/vcos/pthreads -I$(RPI_VC_INC_DIR)/interface/vmcs_host/linux
 
 all: $(LIB) $(LIBPNG)
 

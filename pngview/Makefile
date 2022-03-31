@@ -1,10 +1,18 @@
 OBJS=pngview.o
 BIN=pngview
 
-CFLAGS+=-Wall -g -O3 -I../common $(shell libpng-config --cflags)
-LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm $(shell libpng-config --ldflags) -L../lib -lraspidmx -lraspidmxPng
+RPI_VC_INC_DIR ?= /opt/vc/include
+RPI_VC_LIB_DIR ?= /opt/vc/lib
 
-INCLUDES+=-I/opt/vc/include/ -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux
+ifeq ("$(wildcard $(RPI_VC_INC_DIR))", "")
+RPI_VC_INC_DIR=/usr/include
+RPI_VC_LIB_DIR=/usr/lib/arm-linux-gnueabihf
+endif
+
+CFLAGS+=-Wall -g -O3 -I../common $(shell libpng-config --cflags)
+LDFLAGS+=-L../lib -lraspidmx -lraspidmxPng -L$(RPI_VC_LIB_DIR)/ -lbcm_host -lm $(shell libpng-config --ldflags)
+
+INCLUDES+=-I$(RPI_VC_INC_DIR)/ -I$(RPI_VC_INC_DIR)/interface/vcos/pthreads -I$(RPI_VC_INC_DIR)/interface/vmcs_host/linux
 
 all: $(BIN)
 
